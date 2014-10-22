@@ -33,7 +33,12 @@ _CONFIG2( IESO_OFF & SOSCSEL_SOSC & WUTSEL_LEG & FNOSC_PRIPLL & FCKSM_CSDCMD & O
 
 int main(void)
 {
+    AD1PCFG &= 0xFFFE;                                                          // sets AN0 to analog, rest to digital;
+    AD1CON2 = 0x003C;                                                             // sets SMPI to 1111, 16th sample/convert sequence - configures A/D Voltage Reference
+    AD1CON3 = 0x0D09;
+    AD1CON1 = 0x20E4;
 
+    return 0;
 }
 
 void __attribute__((interrupt,auto_psv)) _CNInterrupt(void)
