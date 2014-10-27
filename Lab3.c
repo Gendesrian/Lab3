@@ -31,10 +31,25 @@ _CONFIG2( IESO_OFF & SOSCSEL_SOSC & WUTSEL_LEG & FNOSC_PRIPLL & FCKSM_CSDCMD & O
 int main(void){
     unsigned long int temp;
     int ADC_value;
-    char value[8];
+    char value1[8];
+    char value2[8];
+    char value3[8];
     double AD_value;
     unsigned int adcBuff[16], i =0;
     unsigned int * adcPtr;
+    unsigned int oc1Temp;
+    unsigned int oc2Temp;
+    unsigned int temp2;
+    unsigned int temp3;
+
+    OC1CON = 0x000E;
+
+    T3CON = 0x8010;                                                             //turn on and set prescaler to 8
+    TMR3 = 0;
+    PR3 = 1024;                                                                 //.55 ms timer
+
+    IFS0bits.T3IF = 0;
+    IEC0bits.T3IE = 0;
 
     LCDInitialize( );
     AD1PCFG &= 0xFFFE;                                                          // AN0 input pin is analog(0), rest all to digital pins(1)
@@ -45,6 +60,8 @@ int main(void){
     AD1CSSL = 0;                                                                // No inputs are scanned
     AD1CON1bits.ADON = 1;                                                       // turn ADC on
 
+
+
     while(1){
         while(!IFS0bits.AD1IF);                                                 // conversion done?
         adcPtr = (unsigned int *)(&ADC1BUF0);                                   // yes
@@ -52,27 +69,44 @@ int main(void){
         temp = 0;                                                               // clear temp
         for (i=0;i<16;i++) {
             adcBuff[i] = *adcPtr++;
-            temp = temp + adcBuff[i];
+            temp = temp + adcBuff[i];   
     }
+                        //Section for PWM
+    OC1RS = ADC_value;
+    temp2 = ADC_value;
 
-    ADC_value = temp/16;                                                        // average the 16 ADC value
-    sprintf(value, "%6d", ADC_value);                                           // copy ADC_value to value with 6 digits to value
+
+    temp3 = ADC_value;
+    temp3 = temp3 ^ 0x03FF;
+    OC2RS = temp3;
+
+
+    ADC_value = temp/16;                                                        // average the 16 ADC value = binary->decimal conversion
+    sprintf(value1, "%6d", ADC_value);                                           // copy ADC_value to value with 6 digits to value
     LCDMoveCursor(0,0);
-    LCDPrintString(value);                                                      // print binary value to lcd
+    LCDPrintString(value1);                                                      // print value to lcd
     AD_value = (ADC_value * 3.3)/1024;
-    sprintf(value, "%6.2f", AD_value);
+
+    oc1Temp = (temp2 * 100) / 1023;
+    oc2Temp = (temp3 * 100) / 1023;
+
+    sprintf(value2, "%3d", oc1Temp);
     LCDMoveCursor(1,0);
-    LCDPrintString(value);                                                      //print digital value to lcd
+    LCDPrintString(value2);
+
+     sprintf(value3, "%3d", oc2Temp);
+    LCDMoveCursor(1,5);
+    LCDPrintString(value3);
+
+
+
+//    sprintf(value, "%6.2f", AD_value);
+//    LCDMoveCursor(1,0);
+//    LCDPrintString(value);                                                      //print digital value to lcd
     }
 
 
-//    Section for PWM
-//    OC1RS = ADCS;
-//
-//    declare some temp2
-//    temp2 = ADCS;
-//    temp2 = temp2 ^ 0xFFFF;
-//    OC2RS = temp2;
+ 
 
     return 0;
 }
@@ -80,5 +114,10 @@ int main(void){
 void _ISR_ADC1Interrupt(void) {
     AD1CON1bits.ASAM = 0;
     IFS0bits.AD1IF = 0;
+
+}
+
+void __attribute__((interrupt)) _T3Interrupt(void){
+    IFS0bits.T3IF = 0;
 
 }
