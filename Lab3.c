@@ -43,6 +43,7 @@ int main(void){
     unsigned int oc2Temp;                                                       // Initialize variable for duty cycle LCD display
     
     OC1CON = 0x000E;                                                            // Set OC1CON to PWM w/o protection
+    OC2CON = 0x000E;                                                            // Set OC2CON to PWM w/o protection
     OC1R = 0;                                                                   // Initialize duty cycle for OC1R to 0%
     OC2R = 0;                                                                   // Initialize duty cycle for OC2R to 0%
 
@@ -61,6 +62,12 @@ int main(void){
     AD1CHS = 0;                                                                 // Configure input channels, connect AN0 as positive input
     AD1CSSL = 0;                                                                // No inputs are scanned
     AD1CON1bits.ADON = 1;                                                       // Turn ADC on
+
+    RPOR1bits.RP2R = 18;
+    RPOR4bits.RP9R = 19;
+
+    TRISAbits.TRISA3 = 0;                                                       //RB3 = pin 10
+    PORTAbits.RA3 = 0;
 
 
     ///////////////////////////FIX ME/////////////////////////////////
