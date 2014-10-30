@@ -43,8 +43,8 @@ _CONFIG1( JTAGEN_OFF & GCP_OFF & GWRP_OFF &
 // Configuration bits for CONFIG2 settings.
 // Make sure "Configuration Bits set in code." option is checked in MPLAB.
 
-_CONFIG2( IESO_OFF & SOSCSEL_SOSC & WUTSEL_LEG & FNOSC_PRIPLL & FCKSM_CSDCMD & OSCIOFNC_OFF &
-		 IOL1WAY_OFF & I2C1SEL_PRI & POSCMOD_XT )
+_CONFIG2( IESO_OFF & SOSCSEL_SOSC & WUTSEL_LEG & FNOSC_PRIPLL & FCKSM_CSDCMD
+        & OSCIOFNC_OFF & IOL1WAY_OFF & I2C1SEL_PRI & POSCMOD_XT )
 
 
 
@@ -61,7 +61,6 @@ int main(void){
     char value1[8];                                                             // Initialize string for ADC_value storage
     char value2[8];                                                             // Initialize string for oc1Temp storage
     char value3[8];                                                             // Initialize string for oc2Temp storage
-    double AD_value;
     unsigned int adcBuff[16], i =0;                                             // Initalize buffer for sampling
     unsigned int * adcPtr;
     unsigned int oc1Temp;                                                       // Initialize variable for duty cycle LCD dispay
